@@ -1,0 +1,4 @@
+redis==2.10.5
+celery==4.0.2
+flask==0.12
+flask-restful==0.3.5

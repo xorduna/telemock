@@ -1,0 +1,18 @@
+# redis
+*.rdb
+
+# pyc
+__pycahe__/
+*.pyc
+
+# virtualenv
+.env/
+venv/
+
+# vcode
+.vscode/
+
+# log files
+*.log
+logs/
+
