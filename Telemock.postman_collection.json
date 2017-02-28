@@ -1,0 +1,124 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Telemock",
+		"_postman_id": "bfce2587-cf7a-006c-d521-9bf66f0b7264",
+		"description": "Telegram API emulator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "{{server_base}}/users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 201\"] = responseCode.code === 201;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{server_base}}/user",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"test-username\",\n\t\"first_name\": \"test-firstname\",\n\t\"second_name\": \"test-secondname\"\n}"
+				},
+				"description": "Creates a new fake telegram user."
+			},
+			"response": []
+		},
+		{
+			"name": "{{server_base}}/bot",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 201\"] = responseCode.code === 201;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{server_base}}/bot",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"botname\": \"test-bot\",\n\t\"callback\": \"http://127.0.0.1:8000/bot\",\n\t\"token\": \"test-token\"\n}"
+				},
+				"description": "creates a new fake bot"
+			},
+			"response": []
+		},
+		{
+			"name": "{{server_base}}/chat",
+			"request": {
+				"url": "{{server_base}}/chat",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\": \"test-username\",\n\t\"botname\": \"test-bot\"\n}"
+				},
+				"description": "(creates a chat between a user and a bot) (returns a chat_id). This will trigger a /start call to the bot callback. Returns a chat id."
+			},
+			"response": []
+		},
+		{
+			"name": "{{server_base}}/chat/{{chat_id}}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"tests[\"Status code is 204\"] = responseCode.code === 204;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "{{server_base}}/chat/{{chat_id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"active\": false\n}"
+				},
+				"description": "simulates that a user block/unblock the bot.\n"
+			},
+			"response": []
+		}
+	]
+}
