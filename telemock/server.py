@@ -8,6 +8,7 @@ import redis
 import logging.handlers
 
 from api import User, Bot, Chat, ChatById
+from bot_api import SendMessage
 
 def setup_logger(app):
     handler = logging.handlers.WatchedFileHandler(app.config['LOG_FILE'])
@@ -42,9 +43,13 @@ if __name__ == '__main__':
     # register api endpoints
     api = Api(app)
 
+    # register internal api endpoints
     api.add_resource(User, '/user')
     api.add_resource(Bot, '/bot')
     api.add_resource(Chat, '/chat')
     api.add_resource(ChatById, '/chat/<chat_id>')
+
+    # register bot api endpoints
+    api.add_resource(SendMessage, '/SendMessage')
 
     app.run()

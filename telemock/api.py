@@ -136,4 +136,4 @@ class ChatById(Resource):
         app.redis_client.hset('chats:%s' % chat_id,
             'active', self.args['active']
         )
-        return {'chat': 'chat'}, 204
+        return {}, 204
