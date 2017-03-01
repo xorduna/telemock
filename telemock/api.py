@@ -12,25 +12,30 @@ class User(Resource):
         """ Input data validation """
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'username', type = str, required = True,
-            help = 'username field is required', location = 'json'
+            'username', type=self.username_validator, required=True,
+            location='json'
         )
         self.reqparse.add_argument(
-            'first_name', type = str, required = True,
-            help = 'first_name field is required', location = 'json'
+            'first_name', type=str, required=True, location='json'
         )
         self.reqparse.add_argument(
-            'second_name', type = str, required = True,
-            help = 'second_name field is required', location = 'json'
+            'second_name', type=str, required=True, location='json'
         )
         self.args = self.reqparse.parse_args()
         super(User, self).__init__()
+
+    def username_validator(self, value):
+        """ Check if username is unique """
+        if app.redis_client.exists('users:%s' % value):
+            raise ValueError('username should be unique')
+        else:
+            return value
 
     def post(self):
         user_id = app.redis_client.incr('last_user_id', amount=1)
         self.args['active'], self.args['id'] = True, user_id
         # save user as a hash - users:user_id
-        app.redis_client.hmset('users:%d' % user_id, self.args)
+        app.redis_client.hmset('users:%s' % self.args['username'], self.args)
         return {'user': self.args}, 201
 
 
@@ -39,10 +44,12 @@ class Bot(Resource):
         """ Input data validation """
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'botname', type=self.botname_validator, required=True, location='json'
+            'botname', type=self.botname_validator, required=True,
+            location='json'
         )
         self.reqparse.add_argument(
-            'callback', type=self.url_validator, required=True, location='json'
+            'callback', type=self.url_validator, required=True,
+            location='json'
         )
         self.reqparse.add_argument(
             'token', type=str, required=True, location='json'
@@ -76,7 +83,7 @@ class Chat(Resource):
         """ Input data validation """
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'username', type=str, required=True, location='json'
+            'username', type=self.username_validator, required=True, location='json'
         )
         self.reqparse.add_argument(
             'botname', type=self.botname_validator, required=True,
@@ -91,6 +98,13 @@ class Chat(Resource):
             return value
         else:
             raise ValueError('botname does\'t exist')
+
+    def username_validator(self, value):
+        """ Check if users:<value> exists """
+        if app.redis_client.exists('users:%s' % value):
+            return value
+        else:
+            raise ValueError('username does\'t exist')
 
     def post(self):
         self.args['id'] = app.redis_client.incr('last_chat_id', amount=1)
