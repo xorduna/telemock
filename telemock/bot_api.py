@@ -12,6 +12,8 @@ from flask_restful import Resource, reqparse, abort
 from random import randint
 
 from tasks import random_replay
+from utils import create_empty_response
+from models import Chat
 
 class SendMessage(Resource):
     """
@@ -59,42 +61,23 @@ class SendMessage(Resource):
             return True
         return False
 
-    def incr_user_msg_id(self, username):
-        """
-            New message increments message_id
-            each user has its own message id correlation
-        """
-        user = 'users:%s' % username
-        # incr user last_message_id
-        app.redis_client.hincrby(user, 'last_message_id', 1)
-
-    def get_chat(self):
-        chat = 'chats:%s' % self.args['chat_id']
-        return app.redis_client.hgetall(chat)
-
-    def get_answers_list(self):
+    def get_msg_info(self):
         if self.is_replay_keyboard():
-            return self.args['reply_markup']['keyboard']
+            return self.args['reply_markup']['keyboard'], 'chat'
         if self.is_inline_keyboard():
-            return self.args['reply_markup']['inline_keyboard']
-        return []
+            return self.args['reply_markup']['inline_keyboard'], 'callback_query'
+        return [], ''
 
     def post(self):
-        chat = self.get_chat()
-        self.incr_user_msg_id(chat[b'username'].decode('utf-8'))
-
-        answers_list = self.get_answers_list()
-        if answers_list:
+        chat = Chat.get(self.args['chat_id'])
+        keyboard, _type = self.get_msg_info()
+        if keyboard:
+            # bot expect response from user
             # launch celery task
             # that will reply in a random time (1, 10)
             # with a random choice
-            bot = 'bots:%s' % chat[b'botname'].decode('utf-8')
-            callback = app.redis_client.hget(bot, 'callback').\
-                decode('utf-8')
-
             random_replay.apply_async(
-                (answers_list, self.args['chat_id'], callback),
-                countdown=randint(1, 10)
+                (keyboard, chat, _type), countdown=randint(1, 10)
             )
         
-        return self.args
+        return create_empty_response()

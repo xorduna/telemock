@@ -7,9 +7,6 @@ from flask_restful import Api
 import redis
 import logging.handlers
 
-from api import User, Bot, Chat, ChatById
-from bot_api import SendMessage
-
 def setup_logger(app):
     handler = logging.handlers.WatchedFileHandler(app.config['LOG_FILE'])
     handler.setFormatter(logging.Formatter(app.config['LOG_FORMAT']))
@@ -30,16 +27,25 @@ def setup_logger(app):
         return response
 
 def setup_redis(app):
-    pool = redis.ConnectionPool.from_url(app.config['REDIS_URI'])
+    pool = redis.ConnectionPool.from_url(
+        app.config['REDIS_URI'], decode_responses=True)
     app.redis_client = redis.Redis(connection_pool=pool)
 
-if __name__ == '__main__':
-    # start telegram mock api server
+def setup_app():
     app = Flask(__name__)
     app.config.from_object('settings')
 
     setup_redis(app)
     setup_logger(app)
+
+    return app
+
+if __name__ == '__main__':
+    from api import User, Bot, Chat, ChatById
+    from bot_api import SendMessage
+
+    # start telegram mock api server
+    app = setup_app()
     # register api endpoints
     api = Api(app)
 

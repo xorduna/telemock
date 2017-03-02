@@ -7,6 +7,7 @@ sys.path.append(os.path.dirname(__file__))
 from celery import Celery
 
 from settings import REDIS_URI
+from server import setup_app
 
 app = Celery(
     'telemock',
@@ -14,3 +15,5 @@ app = Celery(
     backend=REDIS_URI,
     include=['tasks']
 )
+
+flask_app = setup_app()

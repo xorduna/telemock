@@ -1,8 +1,9 @@
 ### Telegram API emulator
+tested with python 3.5
 
 ### Model:
 ```
-    User: username, id (incremental by user), active (boolean), last_message_id
+    User: username, first_name, last_name, id (incremental by user), active (boolean), last_message_id
     Bot: botname, token, id (incremental)
     Chat: username, botname, active (boolean), id (incremental)
 ```

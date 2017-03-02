@@ -19,7 +19,7 @@ class User(Resource):
             'first_name', type=str, required=True, location='json'
         )
         self.reqparse.add_argument(
-            'second_name', type=str, required=True, location='json'
+            'last_name', type=str, required=True, location='json'
         )
         self.args = self.reqparse.parse_args()
         super(User, self).__init__()
@@ -34,7 +34,7 @@ class User(Resource):
     def post(self):
         user_id = app.redis_client.incr('last_user_id', amount=1)
         self.args['active'], self.args['id'] = True, user_id
-        # save user as a hash - users:user_id
+        # save user as a hash - users:username
         app.redis_client.hmset('users:%s' % self.args['username'], self.args)
         return {'user': self.args}, 201
 

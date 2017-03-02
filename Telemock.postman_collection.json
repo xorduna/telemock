@@ -8,6 +8,43 @@
 	},
 	"item": [
 		{
+			"name": "Bot",
+			"description": "Simulated Calls of the Telegram API",
+			"item": [
+				{
+					"name": "{{server_base}}/SendMessage",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "{{server_base}}/SendMessage",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"chat_id\": 1,\n\t\"text\": \"/start\",\n\t\"reply_markup\": {\"keyboard\": [[\"opt1\", \"opt2\"], [\"opt3\", \"opt4\", \"opt5\"]]}\n}"
+						},
+						"description": "simulates that the bot sends a message to a chat user"
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "{{server_base}}/users",
 			"event": [
 				{
@@ -32,7 +69,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"test-username\",\n\t\"first_name\": \"test-firstname\",\n\t\"second_name\": \"test-secondname\"\n}"
+					"raw": "{\n\t\"username\": \"test-username\",\n\t\"first_name\": \"test-firstname\",\n\t\"last_name\": \"test-lastname\"\n}"
 				},
 				"description": "Creates a new fake telegram user."
 			},
