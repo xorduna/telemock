@@ -101,9 +101,24 @@ class SendMessage(BaseApi, BasePostMixin):
         )
         self.args = self.reqparse.parse_args()
 
-    def post(self):
+    def post(self, token):
         return super().post()
 
+class SetWebhook(Resource):
+    """
+        https://core.telegram.org/bots/api#setwebhook
+    """
+    def __init__(self):
+        super().__init__()
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            'url', type=str, required=True, location='form'
+        )
+        self.args = self.reqparse.parse_args()
+
+    def post(self, token):
+        print(self.args['url'])
+        return {'ok': True, 'result': {}}
 
 class SendPhoto(BaseApi, BasePostMixin):
     """ https://core.telegram.org/bots/api#sendphoto """
@@ -118,7 +133,7 @@ class SendPhoto(BaseApi, BasePostMixin):
         # ignore photo
         self.args.pop('photo')
 
-    def post(self):
+    def post(self, token):
         return super().post()
 
 
@@ -138,7 +153,7 @@ class SendDocument(BaseApi, BasePostMixin):
         # ignore document
         self.args.pop('document')
 
-    def post(self):
+    def post(self, token):
         return super().post()
 
 
@@ -158,7 +173,7 @@ class SendVideo(BaseApi, BasePostMixin):
         # ignore video
         self.args.pop('video')
 
-    def post(self):
+    def post(self, token):
         return super().post()
 
 
@@ -175,7 +190,7 @@ class SendAudio(BaseApi, BasePostMixin):
         # ignore audio
         self.args.pop('audio')
 
-    def post(self):
+    def post(self, token):
         return super().post()
 
 
@@ -189,5 +204,5 @@ class SendChatAction(BaseApi):
         )
         self.args = self.reqparse.parse_args()
 
-    def post(self):
+    def post(self, token):
         return create_empty_response()

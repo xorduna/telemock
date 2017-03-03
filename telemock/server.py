@@ -48,7 +48,7 @@ if __name__ == '__main__':
     from api import UserApi, BotApi, ChatApi, ChatByIdApi, ChatMessage
     from bot_api import (
         SendMessage, SendPhoto, SendDocument,
-        SendVideo, SendAudio, SendChatAction)
+        SendVideo, SendAudio, SendChatAction, SetWebhook)
 
     # start telegram mock api server
     app = setup_app()
@@ -63,7 +63,8 @@ if __name__ == '__main__':
     api.add_resource(ChatMessage, '/chat/<chat_id>/message')
 
     # register bot api endpoints
-    api.add_resource(SendMessage, '/sendMessage')
+    api.add_resource(SendMessage, '/bot<token>/sendMessage')
+    api.add_resource(SetWebhook, '/bot<token>/setWebhook')
     api.add_resource(SendChatAction, '/SendChatAction')
 
     api.add_resource(SendPhoto, '/SendPhoto')
