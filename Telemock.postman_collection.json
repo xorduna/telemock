@@ -30,15 +30,220 @@
 						"header": [
 							{
 								"key": "Content-Type",
-								"value": "application/json",
+								"value": "application/x-www-form-urlencoded",
 								"description": ""
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n\t\"chat_id\": 1,\n\t\"text\": \"/start\",\n\t\"reply_markup\": {\"keyboard\": [[\"opt1\", \"opt2\"], [\"opt3\", \"opt4\", \"opt5\"]]}\n}"
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "reply_markup",
+									"value": "{\"keyboard\": [[\"opt1\", \"opt2\"], [\"opt3\", \"opt4\", \"opt5\"]]}",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "chat_id",
+									"value": "1",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "text",
+									"value": "test text",
+									"type": "text",
+									"enabled": true
+								}
+							]
 						},
 						"description": "simulates that the bot sends a message to a chat user"
+					},
+					"response": []
+				},
+				{
+					"name": "{{server_base}}/SendMessage",
+					"request": {
+						"url": "{{server_base}}/SendMessage",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "reply_markup",
+									"value": "{\"inline_keyboard\": [[{\"text\": \"opt1\", \"callback_data\": \"1,1\"}],[{\"text\": \"opt2\", \"callback_data\": \"2,2\"}]]}",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "text",
+									"value": "test poll",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "chat_id",
+									"value": "1",
+									"type": "text",
+									"enabled": true
+								}
+							]
+						},
+						"description": "SendMessage with InlineKeyboardButton data"
+					},
+					"response": []
+				},
+				{
+					"name": "{{server_base}}/SendChatAction",
+					"request": {
+						"url": "{{server_base}}/SendChatAction",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "chat_id",
+									"value": "1",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "action",
+									"value": "typing",
+									"type": "text",
+									"enabled": true
+								}
+							]
+						},
+						"description": "simulate that the bot is typing"
+					},
+					"response": []
+				},
+				{
+					"name": "{{server_base}}/SendDocument",
+					"request": {
+						"url": "{{server_base}}/SendDocument",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "document",
+									"value": "",
+									"type": "file",
+									"enabled": true
+								},
+								{
+									"key": "chat_id",
+									"value": "1",
+									"type": "text",
+									"enabled": true
+								}
+							]
+						},
+						"description": "simulates that the bot sends a document"
+					},
+					"response": []
+				},
+				{
+					"name": "{{server_base}}/SendPhoto",
+					"request": {
+						"url": "{{server_base}}/SendPhoto",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "photo",
+									"value": "",
+									"type": "file",
+									"enabled": true
+								},
+								{
+									"key": "chat_id",
+									"value": "1",
+									"type": "text",
+									"enabled": true
+								},
+								{
+									"key": "reply_markup",
+									"value": "{\"keyboard\": [[\"opt1\", \"opt2\"], [\"opt3\"]]}",
+									"type": "text",
+									"enabled": true
+								}
+							]
+						},
+						"description": "simulates that the bot sends a photo"
+					},
+					"response": []
+				},
+				{
+					"name": "{{server_base}}/SendVideo",
+					"request": {
+						"url": "{{server_base}}/SendVideo",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "audio",
+									"value": "",
+									"type": "file",
+									"enabled": true
+								},
+								{
+									"key": "chat_id",
+									"value": "1",
+									"type": "text",
+									"enabled": true
+								}
+							]
+						},
+						"description": "simulates that the bot sends a Video"
+					},
+					"response": []
+				},
+				{
+					"name": "{{server_base}}/SendAudio",
+					"request": {
+						"url": "{{server_base}}/SendAudio",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "audio",
+									"value": "",
+									"type": "file",
+									"enabled": true
+								},
+								{
+									"key": "chat_id",
+									"value": "1",
+									"type": "text",
+									"enabled": true
+								}
+							]
+						},
+						"description": "simulates that the bot sends a Audio"
 					},
 					"response": []
 				}

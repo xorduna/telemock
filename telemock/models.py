@@ -64,13 +64,13 @@ class Chat:
     """
     @staticmethod
     def get(id):
-        chat = 'chats:%d' % id
+        chat = 'chats:%s' % id
         return app.redis_client.hgetall(chat)
 
     @staticmethod
     def exists(id):
         """ Check if chats:<id> exists """
-        return app.redis_client.exists('chats:%d' % id)
+        return app.redis_client.exists('chats:%s' % id)
 
     @staticmethod
     def create(**kwargs):

@@ -19,7 +19,11 @@ def setup_logger(app):
         app.logger.info("{method} {url}".format(
             method=request.method, url=request.url)
         )
-        app.logger.info(request.data)
+        if request.form:
+            app.logger.info(request.form)
+            app.logger.info(request.files)
+        else:
+            app.logger.info(request.data)
 
     @app.after_request
     def after_request(response):
@@ -42,7 +46,9 @@ def setup_app():
 
 if __name__ == '__main__':
     from api import UserApi, BotApi, ChatApi, ChatByIdApi
-    from bot_api import SendMessage
+    from bot_api import (
+        SendMessage, SendPhoto, SendDocument,
+        SendVideo, SendAudio, SendChatAction)
 
     # start telegram mock api server
     app = setup_app()
@@ -57,5 +63,11 @@ if __name__ == '__main__':
 
     # register bot api endpoints
     api.add_resource(SendMessage, '/SendMessage')
+    api.add_resource(SendChatAction, '/SendChatAction')
+
+    api.add_resource(SendPhoto, '/SendPhoto')
+    api.add_resource(SendDocument, '/SendDocument')
+    api.add_resource(SendVideo, '/SendVideo')
+    api.add_resource(SendAudio, '/SendAudio')
 
     app.run()
