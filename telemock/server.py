@@ -45,7 +45,7 @@ def setup_app():
     return app
 
 if __name__ == '__main__':
-    from api import UserApi, BotApi, ChatApi, ChatByIdApi
+    from api import UserApi, BotApi, ChatApi, ChatByIdApi, ChatMessage
     from bot_api import (
         SendMessage, SendPhoto, SendDocument,
         SendVideo, SendAudio, SendChatAction)
@@ -60,9 +60,10 @@ if __name__ == '__main__':
     api.add_resource(BotApi, '/bot')
     api.add_resource(ChatApi, '/chat')
     api.add_resource(ChatByIdApi, '/chat/<chat_id>')
+    api.add_resource(ChatMessage, '/chat/<chat_id>/message')
 
     # register bot api endpoints
-    api.add_resource(SendMessage, '/SendMessage')
+    api.add_resource(SendMessage, '/sendMessage')
     api.add_resource(SendChatAction, '/SendChatAction')
 
     api.add_resource(SendPhoto, '/SendPhoto')

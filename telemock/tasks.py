@@ -7,8 +7,10 @@ from celery_app import flask_app
 
 import urllib.request
 import random
+import json
+import requests
 
-from utils import create_message_response, create_callback_query_response
+from utils import create_message_response, create_callback_query_response, create_fake_message
 from models import User, Bot, Chat
 
 logger = get_task_logger(__name__)
@@ -20,13 +22,13 @@ def random_replay(keyboard, chat, type='chat'):
         when type=callback_query take create_callback_query_response
     """
     # select random answer
-    answer = random.choice(
-        [item for sublist in keyboard for item in sublist]
-    )
+    print(keyboard)
+    #options = keyboard
+    answer = random.choice(keyboard[0])['text']
 
     bot, user = Bot.get(chat['botname']), User.get(chat['username'])
     if type == 'chat':
-        response = create_message_response(user, bot, answer)
+        response = create_fake_message(user, bot, chat, answer)
     elif type == 'callback_query':
         text, data = answer['text'], answer['callback_data']
         response = create_callback_query_response(user, bot, text, data)
@@ -35,4 +37,30 @@ def random_replay(keyboard, chat, type='chat'):
 
     logger.info('random_replay[type=%s] response: %s' % (type, response))
     # send random answer to the callback_url
-    #urllib.request.urlopen(callback_url, data=response)
+    print(response)
+    r = requests.post(bot['callback'], json=response)
+    print(r.text)
+
+
+@app.task(name="tasks.start_chat")
+def start_chat(chat):
+    bot, user = Bot.get(chat['botname']), User.get(chat['username'])
+    print(bot)
+    #response = create_message_response(user, bot, "/start")
+    response = create_fake_message(user, bot, chat, "/start")
+
+    logger.info('send START message to bot response: %s' % (response))
+    print(response)
+    r = requests.post(bot['callback'], json=response)
+    print(r.text)
+    #   urllib.request.urlopen(bot['callback'], data=json.dumps(response))
+
+
+@app.task(name="task.send_message")
+def send_message(chat, message):
+    bot, user = Bot.get(chat['botname']), User.get(chat['username'])
+    response = create_fake_message(user, bot, chat, message)
+    logger.info('send message to bot response: %s' % (response))
+    print(response)
+    r = requests.post(bot['callback'], json=response)
+    print(r.text)

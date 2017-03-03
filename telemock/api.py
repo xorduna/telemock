@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 
 from models import User, Chat, Bot
 
+import tasks
 
 class UserApi(Resource):
     def __init__(self):
@@ -104,6 +105,7 @@ class ChatApi(Resource):
 
     def post(self):
         chat = Chat.create(**self.args)
+        tasks.start_chat.delay(chat)
         return {'chat': chat}, 201
 
 
@@ -127,4 +129,29 @@ class ChatByIdApi(Resource):
         """ activate/deactivate chat """
         self.chat_id_validator(chat_id)
         Chat.update(chat_id, 'active', self.args['active'])
+        return {}, 204
+
+class ChatMessage(Resource):
+    def __init__(self):
+        """ Input data validation """
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            'text', type=str, required=True, location='json'
+        )
+        self.args = self.reqparse.parse_args()
+        super(ChatMessage, self).__init__()
+
+    def chat_id_validator(self, value):
+        if Chat.exists(value):
+            return value
+        else:
+            abort(400, chat_id='chat_id does\'t exist')
+
+
+    def post(self, chat_id):
+        """ activate/deactivate chat """
+        self.chat_id_validator(chat_id)
+        #Chat.update(chat_id, 'active', self.args['active'])
+        chat = Chat.get(chat_id)
+        tasks.send_message.delay(chat, self.args['text'])
         return {}, 204

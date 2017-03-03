@@ -107,3 +107,59 @@ def create_callback_query_response(user, bot, text, data, is_ok=True):
             }}
         ]
     }
+
+
+def create_fake_message(user, bot, chat, text):
+    """
+    {
+        u'message': {
+            u'from': {
+                u'username': u'xorduna',
+                u'first_name': u'xavi',
+                u'id': 15610499
+            },
+            u'text': u'/start',
+            u'entities': [
+                {u'length': 6, u'type': u'bot_command', u'offset': 0}
+            ],
+            u'chat': {
+                u'username': u'xorduna',
+                u'first_name': u'xavi',
+                u'type': u'private',
+                u'id': 15610499
+            },
+            u'date': 1488558871,
+            u'message_id': 177
+        },
+        u'update_id': 399565371
+    }
+
+    {u'message': {u'date': 1488559366, u'text': u'wola', u'from': {u'username': u'xorduna', u'first_name': u'xavi', u'id': 15610499}, u'message_id': 178, u'chat': {u'username': u'xorduna', u'first_name': u'xavi', u'type': u'private', u'id': 15610499}}, u'update_id': 399565372}
+
+    :param user:
+    :param bot:
+    :param text:
+    :return:
+    """
+    return {
+        'message': {
+            'from': {
+                'username': user['username'],
+                'first_name': user['first_name'],
+                'id': user['id']
+            },
+            'text': text,
+            #'entities': [
+            #    {'length': 6, u'type': u'bot_command', u'offset': 0}
+            #],
+            'chat': {
+                'username': user['username'],
+                'first_name': user['first_name'],
+                'type': u'private',
+                'id': chat['id']
+            },
+            u'date': get_utc_timestamp(),
+            u'message_id': 177
+        },
+        u'update_id': 399565371
+    }
