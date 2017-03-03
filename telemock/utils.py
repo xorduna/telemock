@@ -101,7 +101,7 @@ def create_callback_query_response(user, bot, text, data, is_ok=True):
         'ok': is_ok,
         'result': [{
             'callback_query': {
-                'message': create_base_message(user, bot),
+                'message': create_base_message(user, bot, text),
                 'from': user,
                 'data': data
             }}

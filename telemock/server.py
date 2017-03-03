@@ -41,7 +41,7 @@ def setup_app():
     return app
 
 if __name__ == '__main__':
-    from api import User, Bot, Chat, ChatById
+    from api import UserApi, BotApi, ChatApi, ChatByIdApi
     from bot_api import SendMessage
 
     # start telegram mock api server
@@ -50,10 +50,10 @@ if __name__ == '__main__':
     api = Api(app)
 
     # register internal api endpoints
-    api.add_resource(User, '/user')
-    api.add_resource(Bot, '/bot')
-    api.add_resource(Chat, '/chat')
-    api.add_resource(ChatById, '/chat/<chat_id>')
+    api.add_resource(UserApi, '/user')
+    api.add_resource(BotApi, '/bot')
+    api.add_resource(ChatApi, '/chat')
+    api.add_resource(ChatByIdApi, '/chat/<chat_id>')
 
     # register bot api endpoints
     api.add_resource(SendMessage, '/SendMessage')

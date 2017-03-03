@@ -35,8 +35,7 @@ class SendMessage(Resource):
         super(SendMessage, self).__init__()
 
     def chat_id_validator(self, value):
-        """ Check if chats:<value> exists """
-        if app.redis_client.exists('chats:%s' % value):
+        if Chat.exists(value):
             return value
         else:
             raise ValueError('chat_id does\'t exist')
@@ -62,6 +61,7 @@ class SendMessage(Resource):
         return False
 
     def get_msg_info(self):
+        """ https://core.telegram.org/bots/api#message """
         if self.is_replay_keyboard():
             return self.args['reply_markup']['keyboard'], 'chat'
         if self.is_inline_keyboard():

@@ -6,8 +6,10 @@ from flask_restful import Resource, reqparse, abort
 
 from urllib.parse import urlparse
 
+from models import User, Chat, Bot
 
-class User(Resource):
+
+class UserApi(Resource):
     def __init__(self):
         """ Input data validation """
         self.reqparse = reqparse.RequestParser()
@@ -22,24 +24,22 @@ class User(Resource):
             'last_name', type=str, required=True, location='json'
         )
         self.args = self.reqparse.parse_args()
-        super(User, self).__init__()
+        super(UserApi, self).__init__()
 
     def username_validator(self, value):
         """ Check if username is unique """
-        if app.redis_client.exists('users:%s' % value):
+        print(dir(User))
+        if User.exists(value):
             raise ValueError('username should be unique')
         else:
             return value
 
     def post(self):
-        user_id = app.redis_client.incr('last_user_id', amount=1)
-        self.args['active'], self.args['id'] = True, user_id
-        # save user as a hash - users:username
-        app.redis_client.hmset('users:%s' % self.args['username'], self.args)
-        return {'user': self.args}, 201
+        user = User.create(**self.args)
+        return {'user': user}, 201
 
 
-class Bot(Resource):
+class BotApi(Resource):
     def __init__(self):
         """ Input data validation """
         self.reqparse = reqparse.RequestParser()
@@ -55,7 +55,7 @@ class Bot(Resource):
             'token', type=str, required=True, location='json'
         )
         self.args = self.reqparse.parse_args()
-        super(Bot, self).__init__()
+        super(BotApi, self).__init__()
 
     def url_validator(self, value):
         res = urlparse(value)
@@ -66,19 +66,17 @@ class Bot(Resource):
 
     def botname_validator(self, value):
         """ Check if botname is unique """
-        if app.redis_client.exists('bots:%s' % value):
+        if Bot.exists(value):
             raise ValueError('botname should be unique')
         else:
             return value
 
     def post(self):
-        self.args['id'] = app.redis_client.incr('last_bot_id', amount=1)
-        # save bot as a hash - bots:botname
-        app.redis_client.hmset('bots:%s' % self.args['botname'], self.args)
-        return {'bot': self.args}, 201
+        bot = Bot.create(**self.args)
+        return {'bot': bot}, 201
 
 
-class Chat(Resource):
+class ChatApi(Resource):
     def __init__(self):
         """ Input data validation """
         self.reqparse = reqparse.RequestParser()
@@ -90,30 +88,26 @@ class Chat(Resource):
             location='json'
         )
         self.args = self.reqparse.parse_args()
-        super(Chat, self).__init__()
+        super(ChatApi, self).__init__()
 
     def botname_validator(self, value):
-        """ Check if bots:<value> exists """
-        if app.redis_client.exists('bots:%s' % value):
+        if Bot.exists(value):
             return value
         else:
             raise ValueError('botname does\'t exist')
 
     def username_validator(self, value):
-        """ Check if users:<value> exists """
-        if app.redis_client.exists('users:%s' % value):
+        if User.exists(value):
             return value
         else:
             raise ValueError('username does\'t exist')
 
     def post(self):
-        self.args['id'] = app.redis_client.incr('last_chat_id', amount=1)
-        # save chat as a hash - chats:<chat_id>
-        app.redis_client.hmset('chats:%s' % self.args['id'], self.args)
-        return {'chat': self.args}, 201
+        chat = Chat.create(**self.args)
+        return {'chat': chat}, 201
 
 
-class ChatById(Resource):
+class ChatByIdApi(Resource):
     def __init__(self):
         """ Input data validation """
         self.reqparse = reqparse.RequestParser()
@@ -121,11 +115,10 @@ class ChatById(Resource):
             'active', type=bool, required=True, location='json'
         )
         self.args = self.reqparse.parse_args()
-        super(ChatById, self).__init__()
+        super(ChatByIdApi, self).__init__()
 
     def chat_id_validator(self, value):
-        """ Check if chats:<value> exists """
-        if app.redis_client.exists('chats:%s' % value):
+        if Chat.exists(value):
             return value
         else:
             abort(400, chat_id='chat_id does\'t exist')
@@ -133,7 +126,5 @@ class ChatById(Resource):
     def put(self, chat_id):
         """ activate/deactivate chat """
         self.chat_id_validator(chat_id)
-        app.redis_client.hset('chats:%s' % chat_id,
-            'active', self.args['active']
-        )
+        Chat.update(chat_id, 'active', self.args['active'])
         return {}, 204

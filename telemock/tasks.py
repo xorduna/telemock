@@ -24,16 +24,15 @@ def random_replay(keyboard, chat, type='chat'):
         [item for sublist in keyboard for item in sublist]
     )
 
-    with flask_app.app_context():
-        bot, user = Bot.get(chat['botname']), User.get(chat['username'])
-        if type == 'chat':
-            response = create_message_response(user, bot, answer)
-        elif type == 'callback_query':
-            pass
-        else:
-            raise ValueError("type must be chat or callback_query")
-
+    bot, user = Bot.get(chat['botname']), User.get(chat['username'])
+    if type == 'chat':
+        response = create_message_response(user, bot, answer)
+    elif type == 'callback_query':
+        text, data = answer['text'], answer['callback_data']
+        response = create_callback_query_response(user, bot, text, data)
+    else:
+        raise ValueError("type must be chat or callback_query")
 
     logger.info('random_replay[type=%s] response: %s' % (type, response))
-    # send answer to the callback_url
+    # send random answer to the callback_url
     #urllib.request.urlopen(callback_url, data=response)

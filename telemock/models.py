@@ -17,7 +17,8 @@ class User:
 
     @staticmethod
     def exists(username):
-        pass
+        """ Check if users:<username> exists """
+        return app.redis_client.exists('users:%s' % username)
 
     @staticmethod
     def incr_user_msg_id(username):
@@ -29,6 +30,13 @@ class User:
         # incr user last_message_id
         return app.redis_client.hincrby(user, 'last_message_id', 1)
 
+    def create(**kwargs):
+        kwargs['id'] = app.redis_client.incr('last_user_id', amount=1)
+        kwargs['active'] = True
+        # save user as a hash - users:username
+        app.redis_client.hmset('users:%s' % kwargs['username'], kwargs)
+        return kwargs
+
 
 class Bot:
     """ Bot fields: botname, token, id (incremental) """
@@ -39,7 +47,15 @@ class Bot:
 
     @staticmethod
     def exists(botname):
-        pass
+        """ Check if bots:<botname> exists """
+        return app.redis_client.exists('bots:%s' % botname)
+
+    @staticmethod
+    def create(**kwargs):
+        kwargs['id'] = app.redis_client.incr('last_bot_id', amount=1)
+        # save bot as a hash - bots:botname
+        app.redis_client.hmset('bots:%s' % kwargs['botname'], kwargs)
+        return kwargs
 
 
 class Chat:
@@ -53,4 +69,17 @@ class Chat:
 
     @staticmethod
     def exists(id):
-        pass
+        """ Check if chats:<id> exists """
+        return app.redis_client.exists('chats:%d' % id)
+
+    @staticmethod
+    def create(**kwargs):
+        kwargs['id'] = app.redis_client.incr('last_chat_id', amount=1)
+        # save chat as a hash - chats:<chat_id>
+        app.redis_client.hmset('chats:%s' % kwargs['id'], kwargs)
+        return kwargs
+
+    @staticmethod
+    def update(id, field, value):
+        """ update/add field with value """
+        return app.redis_client.hset('chats:%s' % id, field, value)

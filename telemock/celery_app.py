@@ -17,3 +17,13 @@ app = Celery(
 )
 
 flask_app = setup_app()
+TaskBase = app.Task
+
+class ContextTask(TaskBase):
+    abstract = True
+    def __call__(self, *args, **kwargs):
+        """ add flask context to base celery task class """
+        with flask_app.app_context():
+            return TaskBase.__call__(self, *args, **kwargs)
+
+app.Task = ContextTask
