@@ -8,7 +8,10 @@ from urllib.parse import urlparse
 
 from models import User, Chat, Bot
 
-import tasks
+#import tasks
+from celery_app import make_celery
+
+tasks_app = make_celery()
 
 class UserApi(Resource):
     def __init__(self):
@@ -105,7 +108,8 @@ class ChatApi(Resource):
 
     def post(self):
         chat = Chat.create(**self.args)
-        tasks.start_chat.delay(chat)
+        tasks_app.send_task('tasks.start_chat', kwargs={'chat': chat})
+        #tasks.start_chat.delay(chat)
         return {'chat': chat}, 201
 
 
@@ -153,5 +157,6 @@ class ChatMessage(Resource):
         self.chat_id_validator(chat_id)
         #Chat.update(chat_id, 'active', self.args['active'])
         chat = Chat.get(chat_id)
-        tasks.send_message.delay(chat, self.args['text'])
+        #tasks.send_message.delay(chat, self.args['text'])
+        tasks_app.send_task('task.send_message', kwargs={'chat': chat, 'message': self.args['text']})
         return {}, 204

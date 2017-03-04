@@ -7,6 +7,11 @@ from flask_restful import Api
 import redis
 import logging.handlers
 
+#import api
+#import bot_api
+
+#from api import UserApi, BotApi, ChatApi, ChatByIdApi, ChatMessage
+
 def setup_logger(app):
     handler = logging.handlers.WatchedFileHandler(app.config['LOG_FILE'])
     handler.setFormatter(logging.Formatter(app.config['LOG_FORMAT']))
@@ -42,20 +47,20 @@ def setup_app():
     setup_redis(app)
     setup_logger(app)
 
+
+
     return app
 
-if __name__ == '__main__':
+def create_app():
+    app = setup_app()
+
     from api import UserApi, BotApi, ChatApi, ChatByIdApi, ChatMessage
     from bot_api import (
         SendMessage, SendPhoto, SendDocument,
         SendVideo, SendAudio, SendChatAction, SetWebhook)
 
-    # start telegram mock api server
-    app = setup_app()
-    # register api endpoints
     api = Api(app)
 
-    # register internal api endpoints
     api.add_resource(UserApi, '/user')
     api.add_resource(BotApi, '/bot')
     api.add_resource(ChatApi, '/chat')
@@ -65,11 +70,17 @@ if __name__ == '__main__':
     # register bot api endpoints
     api.add_resource(SendMessage, '/bot<token>/sendMessage')
     api.add_resource(SetWebhook, '/bot<token>/setWebhook')
-    api.add_resource(SendChatAction, '/SendChatAction')
+    api.add_resource(SendChatAction, '/bot<token>/sendChatAction')
 
-    api.add_resource(SendPhoto, '/SendPhoto')
-    api.add_resource(SendDocument, '/SendDocument')
-    api.add_resource(SendVideo, '/SendVideo')
-    api.add_resource(SendAudio, '/SendAudio')
+    api.add_resource(SendPhoto, '/bot<token>/dendPhoto')
+    api.add_resource(SendDocument, '/bot<token>/aendDocument')
+    api.add_resource(SendVideo, '/bot<token>/sendVideo')
+    api.add_resource(SendAudio, '/bot<token>/sendAudio')
+
+    return app
+
+if __name__ == '__main__':
+
+    app = create_app()
 
     app.run()

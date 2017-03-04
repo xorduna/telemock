@@ -27,10 +27,11 @@ class BasePostMixin():
             # launch celery task
             # that will reply in a random time (1, 10)
             # with a random choice
+            print('THERE IS AKEYBAORD')
             random_replay.apply_async(
                 (keyboard, chat, _type), countdown=randint(1, 10)
             )
-
+        print('returning empty response')
         return create_empty_response()
 
 class BaseApi(Resource):

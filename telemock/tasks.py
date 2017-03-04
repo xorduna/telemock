@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from celery.utils.log import get_task_logger
-from celery_app import app
-from celery_app import flask_app
+from celery_app import make_celery
+#from celery_app import flask_app
+
+tasks_app = make_celery()
 
 import urllib.request
 import random
@@ -15,16 +17,18 @@ from models import User, Bot, Chat
 
 logger = get_task_logger(__name__)
 
-@app.task(name='tasks.random_replay')
+@tasks_app.task(name='tasks.random_replay')
 def random_replay(keyboard, chat, type='chat'):
     """
         when type=chat take create_message_response
         when type=callback_query take create_callback_query_response
     """
     # select random answer
-    print(keyboard)
+    print(keyboard[0])
     #options = keyboard
-    answer = random.choice(keyboard[0])['text']
+    answer = random.choice(keyboard[0])
+    if 'text' in answer:
+        answer = answer['text']
 
     bot, user = Bot.get(chat['botname']), User.get(chat['username'])
     if type == 'chat':
@@ -42,7 +46,7 @@ def random_replay(keyboard, chat, type='chat'):
     print(r.text)
 
 
-@app.task(name="tasks.start_chat")
+@tasks_app.task(name="tasks.start_chat")
 def start_chat(chat):
     bot, user = Bot.get(chat['botname']), User.get(chat['username'])
     print(bot)
@@ -56,7 +60,7 @@ def start_chat(chat):
     #   urllib.request.urlopen(bot['callback'], data=json.dumps(response))
 
 
-@app.task(name="task.send_message")
+@tasks_app.task(name="task.send_message")
 def send_message(chat, message):
     bot, user = Bot.get(chat['botname']), User.get(chat['username'])
     response = create_fake_message(user, bot, chat, message)
