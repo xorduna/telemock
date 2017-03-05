@@ -45,7 +45,7 @@ def setup_app():
     app.config.from_object('settings')
 
     setup_redis(app)
-    setup_logger(app)
+    #setup_logger(app)
 
 
 
@@ -83,4 +83,4 @@ if __name__ == '__main__':
 
     app = create_app()
 
-    app.run()
+    app.run(host="0.0.0.0")

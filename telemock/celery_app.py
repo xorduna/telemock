@@ -6,15 +6,15 @@ sys.path.append(os.path.dirname(__file__))
 
 from celery import Celery
 
-from settings import REDIS_URI
+from settings import REDIS_URI, BROKER_URI
 from server import setup_app
 
 def make_celery():
 
     tasks_app = Celery(
         'telemock',
-        broker=REDIS_URI,
-        backend=REDIS_URI,
+        broker=BROKER_URI,
+#        backend=REDIS_URI,
         include=['tasks']
     )
 
