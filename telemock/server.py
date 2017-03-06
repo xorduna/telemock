@@ -47,7 +47,9 @@ def setup_app():
     setup_redis(app)
     #setup_logger(app)
 
-
+    @app.route("/")
+    def home():
+        return 'this is telemock :)!'
 
     return app
 
