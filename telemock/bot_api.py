@@ -12,6 +12,7 @@ from werkzeug.datastructures import FileStorage
 
 from random import randint
 import json
+import time
 
 from tasks import random_replay
 from utils import create_empty_response
@@ -206,4 +207,12 @@ class SendChatAction(BaseApi):
         self.args = self.reqparse.parse_args()
 
     def post(self, token):
+        return create_empty_response()
+
+
+class GetUpdates(Resource):
+    """ https://core.telegram.org/bots/api#getupdates """
+
+    def post(self, token):
+        time.sleep(10)
         return create_empty_response()

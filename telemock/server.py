@@ -56,7 +56,7 @@ def create_app():
 
     from api import UserApi, BotApi, ChatApi, ChatByIdApi, ChatMessage
     from bot_api import (
-        SendMessage, SendPhoto, SendDocument,
+        SendMessage, GetUpdates, SendPhoto, SendDocument,
         SendVideo, SendAudio, SendChatAction, SetWebhook)
 
     api = Api(app)
@@ -71,6 +71,7 @@ def create_app():
     api.add_resource(SendMessage, '/bot<token>/sendMessage')
     api.add_resource(SetWebhook, '/bot<token>/setWebhook')
     api.add_resource(SendChatAction, '/bot<token>/sendChatAction')
+    api.add_resource(GetUpdates, '/bot<token>/getUpdates')
 
     api.add_resource(SendPhoto, '/bot<token>/dendPhoto')
     api.add_resource(SendDocument, '/bot<token>/aendDocument')

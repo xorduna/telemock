@@ -4,7 +4,7 @@
 import os
 from datetime import datetime
 
-from models import User
+from models import User, Chat
 
 def env_setting(setting_name, default=''):
     """ Fetch setting value from env, if not exist take default """
@@ -141,6 +141,8 @@ def create_fake_message(user, bot, chat, text):
     :param text:
     :return:
     """
+
+    update_id = Chat.incr_update_id(chat['id'])
     return {
         'message': {
             'from': {
@@ -161,5 +163,5 @@ def create_fake_message(user, bot, chat, text):
             u'date': get_utc_timestamp(),
             u'message_id': 177
         },
-        u'update_id': 399565371
+        u'update_id': update_id
     }

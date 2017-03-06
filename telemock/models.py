@@ -60,7 +60,8 @@ class Bot:
 
 class Chat:
     """ Chat fields:
-            username, botname, active (boolean), id (incremental)
+            username, botname, active (boolean), id (incremental),
+            update_id (incremental for each chat)
     """
     @staticmethod
     def get(id):
@@ -83,3 +84,10 @@ class Chat:
     def update(id, field, value):
         """ update/add field with value """
         return app.redis_client.hset('chats:%s' % id, field, value)
+
+    @staticmethod
+    def incr_update_id(id):
+        """ increments update_id """
+        chat = 'chats:%s' % id
+        # incr chat update_id
+        return app.redis_client.hincrby(chat, 'update_id', 1)
