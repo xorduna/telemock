@@ -52,13 +52,13 @@ class BaseApi(Resource):
         if Chat.exists(value):
             return value
         else:
-            raise ValueError('chat_id does\'t exist')
+            raise ValueError(description='chat_id does\'t exist', ok=False)
 
     def reply_markup_validator(self, value):
         try:
             return json.loads(value)
         except json.decoder.JSONDecodeError:
-            raise ValueError('reply_markup should be a dict')
+            raise abort(description='reply_markup should be a dict', ok=False)
 
     def is_replay_keyboard(self):
         """

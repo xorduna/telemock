@@ -75,8 +75,8 @@ def create_app():
     api.add_resource(SendChatAction, '/bot<token>/sendChatAction')
     api.add_resource(GetUpdates, '/bot<token>/getUpdates')
 
-    api.add_resource(SendPhoto, '/bot<token>/dendPhoto')
-    api.add_resource(SendDocument, '/bot<token>/aendDocument')
+    api.add_resource(SendPhoto, '/bot<token>/sendPhoto')
+    api.add_resource(SendDocument, '/bot<token>/sendDocument')
     api.add_resource(SendVideo, '/bot<token>/sendVideo')
     api.add_resource(SendAudio, '/bot<token>/sendAudio')
 
