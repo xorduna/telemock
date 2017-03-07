@@ -14,21 +14,6 @@ from celery_app import make_celery
 tasks_app = make_celery()
 
 class UserApi(Resource):
-    def __init__(self):
-        """ Input data validation """
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument(
-            'username', type=self.username_validator, required=True,
-            location='json'
-        )
-        self.reqparse.add_argument(
-            'first_name', type=str, required=True, location='json'
-        )
-        self.reqparse.add_argument(
-            'last_name', type=str, required=True, location='json'
-        )
-        self.args = self.reqparse.parse_args()
-        super(UserApi, self).__init__()
 
     def username_validator(self, value):
         """ Check if username is unique """
@@ -38,28 +23,37 @@ class UserApi(Resource):
         else:
             return value
 
+    def delete_user_validator(self, value):
+        if User.exists(value):
+            return value
+        else:
+            abort(400, username='username does\'t exist')
+
     def post(self):
-        user = User.create(**self.args)
+        _reqparse = reqparse.RequestParser()
+        _reqparse.add_argument(
+            'username', type=self.username_validator, required=True,
+            location='json'
+        )
+        _reqparse.add_argument(
+            'first_name', type=str, required=True, location='json'
+        )
+        _reqparse.add_argument(
+            'last_name', type=str, required=True, location='json'
+        )
+        user = User.create(**_reqparse.parse_args())
         return {'user': user}, 201
+
+    def delete(self, username):
+        self.delete_user_validator(username)
+        User.delete(username)
+        return {}, 204
+
+    def get(self):
+        return {'users': User.get_all()}
 
 
 class BotApi(Resource):
-    def __init__(self):
-        """ Input data validation """
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument(
-            'botname', type=self.botname_validator, required=True,
-            location='json'
-        )
-        self.reqparse.add_argument(
-            'callback', type=self.url_validator, required=True,
-            location='json'
-        )
-        self.reqparse.add_argument(
-            'token', type=str, required=True, location='json'
-        )
-        self.args = self.reqparse.parse_args()
-        super(BotApi, self).__init__()
 
     def url_validator(self, value):
         res = urlparse(value)
@@ -75,24 +69,38 @@ class BotApi(Resource):
         else:
             return value
 
+    def delete_bot_validator(self, value):
+        if Bot.exists(value):
+            return value
+        else:
+            abort(400, botname='botname does\'t exist')
+
     def post(self):
-        bot = Bot.create(**self.args)
-        return {'bot': bot}, 201
-
-
-class ChatApi(Resource):
-    def __init__(self):
-        """ Input data validation """
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument(
-            'username', type=self.username_validator, required=True, location='json'
-        )
-        self.reqparse.add_argument(
+        _reqparse = reqparse.RequestParser()
+        _reqparse.add_argument(
             'botname', type=self.botname_validator, required=True,
             location='json'
         )
-        self.args = self.reqparse.parse_args()
-        super(ChatApi, self).__init__()
+        _reqparse.add_argument(
+            'callback', type=self.url_validator, required=True,
+            location='json'
+        )
+        _reqparse.add_argument(
+            'token', type=str, required=True, location='json'
+        )
+        bot = Bot.create(**_reqparse.parse_args())
+        return {'bot': bot}, 201
+
+    def delete(self, botname):
+        self.delete_bot_validator(botname)
+        Bot.delete(botname)
+        return {}, 204
+
+    def get(self):
+        return {'bots': Bot.get_all()}
+
+
+class ChatApi(Resource):
 
     def botname_validator(self, value):
         if Bot.exists(value):
@@ -106,34 +114,47 @@ class ChatApi(Resource):
         else:
             raise ValueError('username does\'t exist')
 
-    def post(self):
-        chat = Chat.create(**self.args)
-        tasks_app.send_task('tasks.start_chat', kwargs={'chat': chat})
-        #tasks.start_chat.delay(chat)
-        return {'chat': chat}, 201
-
-
-class ChatByIdApi(Resource):
-    def __init__(self):
-        """ Input data validation """
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument(
-            'active', type=bool, required=True, location='json'
-        )
-        self.args = self.reqparse.parse_args()
-        super(ChatByIdApi, self).__init__()
-
     def chat_id_validator(self, value):
         if Chat.exists(value):
             return value
         else:
             abort(400, chat_id='chat_id does\'t exist')
 
+    def post(self):
+        _reqparse = reqparse.RequestParser()
+        _reqparse.add_argument(
+            'username', type=self.username_validator, required=True, location='json'
+        )
+        _reqparse.add_argument(
+            'botname', type=self.botname_validator, required=True,
+            location='json'
+        )
+
+        chat = Chat.create(**_reqparse.parse_args())
+        tasks_app.send_task('tasks.start_chat', kwargs={'chat': chat})
+        #tasks.start_chat.delay(chat)
+        return {'chat': chat}, 201
+
     def put(self, chat_id):
         """ activate/deactivate chat """
+        _reqparse = reqparse.RequestParser()
+        _reqparse.add_argument(
+            'active', type=bool, required=True, location='json'
+        )
+        args = _reqparse.parse_args()
+
         self.chat_id_validator(chat_id)
-        Chat.update(chat_id, 'active', self.args['active'])
+        Chat.update(chat_id, 'active', args['active'])
         return {}, 204
+
+    def delete(self, chat_id):
+        self.chat_id_validator(chat_id)
+        Chat.delete(chat_id)
+        return {}, 204
+
+    def get(self):
+        return {'chats': Chat.get_all()}
+
 
 class ChatMessage(Resource):
     def __init__(self):
@@ -150,7 +171,6 @@ class ChatMessage(Resource):
             return value
         else:
             abort(400, chat_id='chat_id does\'t exist')
-
 
     def post(self, chat_id):
         """ activate/deactivate chat """

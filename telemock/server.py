@@ -40,6 +40,28 @@ def setup_redis(app):
         app.config['REDIS_URI'], decode_responses=True)
     app.redis_client = redis.Redis(connection_pool=pool)
 
+    lua_script = """
+        local collate = function (key)
+            local raw_data = redis.call('HGETALL', key)
+            local data = {}
+
+            for idx = 1, #raw_data, 2 do
+                data[raw_data[idx]] = raw_data[idx + 1]
+            end
+
+            return data
+        end
+
+        local data = {}
+
+        for _, key in pairs(KEYS) do
+            data[#data+1] = collate(key)
+        end
+
+        return cjson.encode(data)
+    """
+    app.hgetall_keys = app.redis_client.register_script(lua_script)
+
 def setup_app():
     app = Flask(__name__)
     app.config.from_object('settings')
@@ -56,17 +78,16 @@ def setup_app():
 def create_app():
     app = setup_app()
 
-    from api import UserApi, BotApi, ChatApi, ChatByIdApi, ChatMessage
+    from api import UserApi, BotApi, ChatApi, ChatMessage
     from bot_api import (
         SendMessage, GetUpdates, SendPhoto, SendDocument,
         SendVideo, SendAudio, SendChatAction, SetWebhook)
 
     api = Api(app)
 
-    api.add_resource(UserApi, '/user')
-    api.add_resource(BotApi, '/bot')
-    api.add_resource(ChatApi, '/chat')
-    api.add_resource(ChatByIdApi, '/chat/<chat_id>')
+    api.add_resource(UserApi, '/user', '/user/<username>')
+    api.add_resource(BotApi, '/bot', '/bot/<botname>')
+    api.add_resource(ChatApi, '/chat', '/chat/<chat_id>')
     api.add_resource(ChatMessage, '/chat/<chat_id>/message')
 
     # register bot api endpoints

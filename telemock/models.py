@@ -5,6 +5,8 @@
 
 from flask import current_app as app
 
+import json
+
 class User:
     """ User fields: 
             username, first_name, last_name, id (incremental by user),
@@ -14,6 +16,16 @@ class User:
     def get(username):
         user = 'users:%s' % username
         return app.redis_client.hgetall(user)
+
+    @staticmethod
+    def get_all():
+        users = app.redis_client.keys('users:*')
+        return json.loads(app.hgetall_keys(keys=users))
+
+    @staticmethod
+    def delete(username):
+        user = 'users:%s' % username
+        return app.redis_client.delete(user)
 
     @staticmethod
     def exists(username):
@@ -46,6 +58,16 @@ class Bot:
         return app.redis_client.hgetall(bot)
 
     @staticmethod
+    def get_all():
+        bots = app.redis_client.keys('bots:*')
+        return json.loads(app.hgetall_keys(keys=bots))
+
+    @staticmethod
+    def delete(botname):
+        bot = 'bots:%s' % botname
+        return app.redis_client.delete(bot)
+
+    @staticmethod
     def exists(botname):
         """ Check if bots:<botname> exists """
         return app.redis_client.exists('bots:%s' % botname)
@@ -67,6 +89,16 @@ class Chat:
     def get(id):
         chat = 'chats:%s' % id
         return app.redis_client.hgetall(chat)
+
+    @staticmethod
+    def get_all():
+        chats = app.redis_client.keys('chats:*')
+        return json.loads(app.hgetall_keys(keys=chats))
+
+    @staticmethod
+    def delete(id):
+        chat = 'chats:%s' % id
+        return app.redis_client.delete(chat)
 
     @staticmethod
     def exists(id):

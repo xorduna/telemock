@@ -361,6 +361,72 @@
 				"description": "simulates that a user block/unblock the bot.\n"
 			},
 			"response": []
+		},
+		{
+			"name": "{{server_base}}/user/{{username}}",
+			"request": {
+				"url": "{{server_base}}/user/{{username}}",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": "delete user with given username"
+			},
+			"response": []
+		},
+		{
+			"name": "{{server_base}}/bot/{{botname}}",
+			"request": {
+				"url": "{{server_base}}/bot/{{botname}}",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": "delete bot by botname"
+			},
+			"response": []
+		},
+		{
+			"name": "{{server_base}}/chat/{{chat_id}}",
+			"request": {
+				"url": "{{server_base}}/chat/{{chat_id}}",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": "delete chat by id"
+			},
+			"response": []
+		},
+		{
+			"name": "{{server_base}}/bot",
+			"request": {
+				"url": "{{server_base}}/bot",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "get all bot objects"
+			},
+			"response": []
+		},
+		{
+			"name": "{{server_base}}/user",
+			"request": {
+				"url": "{{server_base}}/user",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "get all user objects"
+			},
+			"response": []
+		},
+		{
+			"name": "{{server_base}}/chat",
+			"request": {
+				"url": "{{server_base}}/chat",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "get all chat objects"
+			},
+			"response": []
 		}
 	]
 }
