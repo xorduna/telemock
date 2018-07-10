@@ -9,24 +9,21 @@ from celery import Celery
 from settings import REDIS_URI, BROKER_URI
 from server import setup_app
 
-def make_celery():
+tasks_app = Celery(
+    'telemock',
+    broker=BROKER_URI,
+    #backend=REDIS_URI,
+    include=['tasks']
+)
 
-    tasks_app = Celery(
-        'telemock',
-        broker=BROKER_URI,
-#        backend=REDIS_URI,
-        include=['tasks']
-    )
+flask_app = setup_app()
+TaskBase = tasks_app.Task
 
-    flask_app = setup_app()
-    TaskBase = tasks_app.Task
+class ContextTask(TaskBase):
+    abstract = True
+    def __call__(self, *args, **kwargs):
+        """ add flask context to base celery task class """
+        with flask_app.app_context():
+            return TaskBase.__call__(self, *args, **kwargs)
 
-    class ContextTask(TaskBase):
-        abstract = True
-        def __call__(self, *args, **kwargs):
-            """ add flask context to base celery task class """
-            with flask_app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
-
-    tasks_app.Task = ContextTask
-    return tasks_app
+tasks_app.Task = ContextTask

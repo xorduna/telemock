@@ -9,9 +9,8 @@ from urllib.parse import urlparse
 from models import User, Chat, Bot
 
 #import tasks
-from celery_app import make_celery
+from celery_app import tasks_app
 
-tasks_app = make_celery()
 
 class UserApi(Resource):
 

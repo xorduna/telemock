@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from celery.utils.log import get_task_logger
-from celery_app import make_celery
+from celery_app import tasks_app
 #from celery_app import flask_app
-
-tasks_app = make_celery()
 
 import urllib.request
 import random
