@@ -30,7 +30,9 @@ def random_replay(keyboard, chat, type='chat'):
     if 'text' in answer:
         answer = answer['text']
 
-    bot, user = Bot.get(chat['botname']), User.get(chat['username'])
+    bot = Bot.get(chat['botname'])
+    user = User.get(chat['username'])
+
     if type == 'chat':
         response = create_fake_message(user, bot, chat, answer)
     elif type == 'callback_query':
